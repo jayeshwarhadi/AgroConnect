@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h1>Admin Dashboard</h1>
+<table>
+    <tr>
+        <th>Seller ID</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for seller in sellers %}
+    <tr>
+        <td>{{ seller[0] }}</td>
+        <td>{% if seller[2] %}Active{% else %}Inactive{% endif %}</td>
+        <td>
+            <a href="{{ url_for('admin.delete_seller', seller_id=seller[0]) }}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

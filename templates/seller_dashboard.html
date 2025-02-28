@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block content %}
+<h1>Seller Dashboard</h1>
+<p>Subscription Status: {% if seller[2] %}Active{% else %}Inactive{% endif %}</p>
+{% if not seller[2] %}
+    <a href="{{ url_for('seller.subscribe') }}">Subscribe Now</a>
+{% endif %}
+{% endblock %}

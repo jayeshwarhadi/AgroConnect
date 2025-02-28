@@ -7,13 +7,13 @@ from config import Config
 stripe.api_key = Config.STRIPE_SECRET_KEY
 seller_bp = Blueprint('seller', __name__)
 
-@seller_bp.route('/dashboard')
+@seller_bp.route("/dashboard")
 def dashboard():
-    if 'user_id' not in session:
+    if "user_id" not in session:
         flash("You must be logged in!", "danger")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for("auth.login"))
 
-    user_id = session['user_id']
+    user_id = session["user_id"]
     
     conn = connect_db()
     cursor = conn.cursor()
@@ -23,9 +23,19 @@ def dashboard():
 
     if not seller:
         flash("No seller account found.", "danger")
-        return redirect(url_for('public.home'))
+        return redirect(url_for("public.home"))
 
-    return render_template('seller_dashboard.html', seller=seller)
+    # Get seller details
+    seller_id, user_id, subscription_active, trial_end_date = seller
+
+    # Check if trial is still active
+    trial_active = trial_end_date and datetime.strptime(trial_end_date, "%Y-%m-%d %H:%M:%S") > datetime.now()
+
+    if not subscription_active and not trial_active:
+        flash("Your trial has ended! Subscribe to continue selling.", "danger")
+        return redirect(url_for("seller.subscribe"))
+
+    return render_template("seller_dashboard.html", seller=seller, trial_active=trial_active)
 
 @seller_bp.route('/subscribe')
 def subscribe():

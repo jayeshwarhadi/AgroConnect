@@ -4,8 +4,13 @@
 
 {% block content %}
 <h1>Seller Dashboard</h1>
-<p>Subscription Status: {% if seller[2] %}Active{% else %}Inactive{% endif %}</p>
-{% if not seller[2] %}
+
+{% if trial_active %}
+    <p><strong>You are on a free trial.</strong> It expires on: {{ seller[3] }}</p>
+{% elif seller[2] %}
+    <p><strong>Your subscription is active.</strong></p>
+{% else %}
+    <p><strong>Your trial has expired.</strong> Please subscribe to continue selling.</p>
     <a href="{{ url_for('seller.subscribe') }}">Subscribe Now</a>
 {% endif %}
 {% endblock %}

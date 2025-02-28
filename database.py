@@ -18,15 +18,14 @@ def create_tables():
         )
     ''')
 
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS sellers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER UNIQUE NOT NULL,
-            active_subscription INTEGER DEFAULT 0,
-            subscription_expiry TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            user_id INTEGER UNIQUE,
+            subscription_active INTEGER DEFAULT 0,
+            trial_end_date TEXT DEFAULT NULL
         )
-    ''')
+    """)
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS products (

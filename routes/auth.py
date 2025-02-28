@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash , session
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import connect_db
@@ -25,26 +26,28 @@ def login():
 
     return render_template('login.html')
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = generate_password_hash(request.form['password'])
-
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = generate_password_hash(request.form["password"])
+        
         conn = connect_db()
         cursor = conn.cursor()
-        try:
-            cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", 
-                           (username, email, password))
-            user_id = cursor.lastrowid
-            cursor.execute("INSERT INTO sellers (user_id) VALUES (?)", (user_id,))
-            conn.commit()
-            flash("Account created successfully!", "success")
-            return redirect(url_for('auth.login'))
-        except:
-            flash("Error: Email already exists!", "danger")
-        finally:
-            conn.close()
+        
+        # Insert user
+        cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
+        user_id = cursor.lastrowid
+        
+        # Set 7-day trial period
+        trial_end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute("INSERT INTO sellers (user_id, subscription_active, trial_end_date) VALUES (?, ?, ?)", (user_id, 0, trial_end_date))
+        
+        conn.commit()
+        conn.close()
+        
+        flash("Registration successful! You have a 7-day free trial.", "success")
+        return redirect(url_for("auth.login"))
 
-    return render_template('register.html')
+    return render_template("register.html")

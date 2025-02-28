@@ -12,7 +12,7 @@ def home():
         FROM products
         JOIN sellers ON products.seller_id = sellers.id
         JOIN users ON sellers.user_id = users.id
-        WHERE sellers.active_subscription = 1
+        WHERE sellers.subscription_active = 1
     """)
     products = cursor.fetchall()
     conn.close()
